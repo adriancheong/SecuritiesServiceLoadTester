@@ -13,7 +13,7 @@ namespace SecuritiesServiceLoadTester
         private static readonly string SECURITY_SERVICE_ADDRESS = "http://128.199.219.151:16555/";
         private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
-        private static readonly int DEFAULT_NUMBER_OF_RUNS = 5;
+        private static readonly int DEFAULT_NUMBER_OF_RUNS = 1;
 
         private static int threads = DEFAULT_NUMBER_OF_THREADS;
         private static int spamCount = DEFAULT_SPAM_COUNT;
@@ -43,16 +43,16 @@ namespace SecuritiesServiceLoadTester
                 computeLosses = 0;
                 syncLoadTestTotal += performSyncLoadTest(spamCount);
                 System.Threading.Thread.Sleep(2000);
-                asyncLoadTestTotal += performAsyncLoadTest(spamCount);
-                System.Threading.Thread.Sleep(2000);
+                //asyncLoadTestTotal += performAsyncLoadTest(spamCount);
+                //System.Threading.Thread.Sleep(2000);
                 syncComputeTestTotal += performSyncComputeTest(spamCount);
-                System.Threading.Thread.Sleep(2000);
-                asyncComputeTestTotal += performAsyncComputeTest(spamCount);
+                //System.Threading.Thread.Sleep(2000);
+                //asyncComputeTestTotal += performAsyncComputeTest(spamCount);
                 Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
                 Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
                 Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
                 Console.WriteLine();
-                System.Threading.Thread.Sleep(5000);
+                //System.Threading.Thread.Sleep(5000);
             }
 
             Console.WriteLine();
