@@ -11,26 +11,58 @@ namespace SecuritiesServiceLoadTester
     public class Program
     {
         private static readonly string SECURITY_SERVICE_ADDRESS = "http://128.199.219.151:16555/";
-        private static readonly int DEFAULT_SPAM_COUNT = 100;
+        private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
+        private static readonly int DEFAULT_NUMBER_OF_RUNS = 5;
 
         private static int threads = DEFAULT_NUMBER_OF_THREADS;
         private static int spamCount = DEFAULT_SPAM_COUNT;
+        private static int loadLosses;
+        private static int computeLosses;
 
         public static void Main(string[] args)
         {
+            double syncLoadTestTotal = 0;
+            double asyncLoadTestTotal = 0;
+            double syncComputeTestTotal = 0;
+            double asyncComputeTestTotal = 0;
+
             parseSpamCountIfExists(args);
             parseThreadCountIfExists(args);
 
             Console.WriteLine("---=== Starting Load Tests ===---");
             Console.WriteLine("Number of calls:\t" + spamCount);
             Console.WriteLine("Number of threads:\t" + threads);
+            Console.WriteLine("Number of runs:\t\t" + DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
 
-            performSyncLoadTest(spamCount);
-            performAsyncLoadTest(spamCount);
-            performSyncComputeTest(spamCount);
-            performAsyncComputeTest(spamCount);
+            for (int i = 0; i < DEFAULT_NUMBER_OF_RUNS; i++)
+            {
+                Console.WriteLine("---=== Commencing run {0} ===---", i + 1);
+                loadLosses = 0;
+                computeLosses = 0;
+                syncLoadTestTotal += performSyncLoadTest(spamCount);
+                System.Threading.Thread.Sleep(2000);
+                asyncLoadTestTotal += performAsyncLoadTest(spamCount);
+                System.Threading.Thread.Sleep(2000);
+                syncComputeTestTotal += performSyncComputeTest(spamCount);
+                System.Threading.Thread.Sleep(2000);
+                asyncComputeTestTotal += performAsyncComputeTest(spamCount);
+                Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
+                Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
+                Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(5000);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("---=== Results ===---");
+            Console.WriteLine("Sync Load Test Average:\t\t{0} seconds", syncLoadTestTotal / DEFAULT_NUMBER_OF_RUNS);
+            Console.WriteLine("Async Load Test Average:\t{0} seconds", asyncLoadTestTotal / DEFAULT_NUMBER_OF_RUNS);
+            Console.WriteLine("Sync Compute Test Average:\t{0} seconds", syncComputeTestTotal / DEFAULT_NUMBER_OF_RUNS);
+            Console.WriteLine("Async Compute Test Average:\t{0} seconds", asyncComputeTestTotal / DEFAULT_NUMBER_OF_RUNS);
+            Console.WriteLine();
+
 
             Console.WriteLine("Press enter to exit");
             Console.ReadLine();
@@ -64,7 +96,7 @@ namespace SecuritiesServiceLoadTester
             }
         }
 
-        private static void performAsyncComputeTest(int spamCount)
+        private static double performAsyncComputeTest(int spamCount)
         {
             Stopwatch stopwatch = new Stopwatch();
             Console.WriteLine("Begin Async Compute Test");
@@ -72,9 +104,11 @@ namespace SecuritiesServiceLoadTester
             runMethodAsynchronously(() => computeTest(spamCount / threads));
             stopwatch.Stop();
             Console.WriteLine("Compute test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
+
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
-        private static void performSyncComputeTest(int spamCount)
+        private static double performSyncComputeTest(int spamCount)
         {
             Stopwatch stopwatch = new Stopwatch();
             Console.WriteLine("Begin Sync Compute Test");
@@ -82,6 +116,8 @@ namespace SecuritiesServiceLoadTester
             computeTest(spamCount);
             stopwatch.Stop();
             Console.WriteLine("Compute test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
+
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
         private static void computeTest(int spamCount)
@@ -90,11 +126,19 @@ namespace SecuritiesServiceLoadTester
             {
                 string param = "ISIN" + (i);
                 string paramString = @"Security/Compute/" + param;
-                string result = restGet(SECURITY_SERVICE_ADDRESS, paramString);
+                try
+                {
+                    string result = restGet(SECURITY_SERVICE_ADDRESS, paramString);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception Occured: " + e.Message);
+                    computeLosses++;
+                }
             }
         }
 
-        private static void performAsyncLoadTest(int spamCount)
+        private static double performAsyncLoadTest(int spamCount)
         {
             Stopwatch stopwatch = new Stopwatch();
             Console.WriteLine("Begin Async Load Test");
@@ -103,9 +147,11 @@ namespace SecuritiesServiceLoadTester
             stopwatch.Stop();
             Console.WriteLine("Load test complete. Total Securities Queried: {0}", spamCount);
             Console.WriteLine("Load test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
+
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
-        private static void performSyncLoadTest(int spamCount)
+        private static double performSyncLoadTest(int spamCount)
         {
             Stopwatch stopwatch = new Stopwatch();
             Console.WriteLine("Begin Sync Load Test");
@@ -114,6 +160,8 @@ namespace SecuritiesServiceLoadTester
             stopwatch.Stop();
             Console.WriteLine("Load test complete. Total Securities Queried: {0}", spamCount);
             Console.WriteLine("Load test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
+
+            return stopwatch.Elapsed.TotalSeconds;
         }
 
         private static void loadTest(int spamCount)
@@ -121,9 +169,22 @@ namespace SecuritiesServiceLoadTester
             for (int i = 0; i < spamCount; i++)
             {
                 string param = "ISIN" + (i);
-                string paramString = @"Security/" + param;
-                string result = restGet(SECURITY_SERVICE_ADDRESS, paramString);
-                //Console.WriteLine(result);
+                string paramString = @"Security?securityId="+param+"&property=Valuation";
+                try
+                {
+                    string result = restGet(SECURITY_SERVICE_ADDRESS, paramString);
+                    if (String.IsNullOrEmpty(result))
+                    {
+                        Console.WriteLine("Empty or null value returned");
+                        loadLosses++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception Occured: " + e.Message);
+                    loadLosses++;
+                }
+                
             }
         }
 
