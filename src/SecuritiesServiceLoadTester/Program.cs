@@ -12,35 +12,64 @@ namespace SecuritiesServiceLoadTester
     {
         private static readonly string SECURITY_SERVICE_ADDRESS = "http://128.199.219.151:16555/";
         private static readonly int DEFAULT_SPAM_COUNT = 100;
-        private static readonly int NUMBER_OF_THREADS = 4;
+        private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
+
+        private static int threads = DEFAULT_NUMBER_OF_THREADS;
+        private static int spamCount = DEFAULT_SPAM_COUNT;
 
         public static void Main(string[] args)
         {
-            int spamCount = DEFAULT_SPAM_COUNT;
-            if (args != null && args.Length == 1)
-            {
-                int.TryParse(args[0], out spamCount);
-            }
+            parseSpamCountIfExists(args);
+            parseThreadCountIfExists(args);
 
-            //performSyncLoadTest(spamCount);
-            //performAsyncLoadTest(spamCount);
-            //performSyncComputeTest(spamCount);
-            performAsyncComputeTest(spamCount);
-            performAsyncComputeTest(spamCount);
-            performAsyncComputeTest(spamCount);
-            performAsyncComputeTest(spamCount);
+            Console.WriteLine("---=== Starting Load Tests ===---");
+            Console.WriteLine("Number of calls:\t" + spamCount);
+            Console.WriteLine("Number of threads:\t" + threads);
+            Console.WriteLine();
+
+            performSyncLoadTest(spamCount);
+            performAsyncLoadTest(spamCount);
+            performSyncComputeTest(spamCount);
             performAsyncComputeTest(spamCount);
 
             Console.WriteLine("Press enter to exit");
             Console.ReadLine();
         }
 
+        private static void parseThreadCountIfExists(string[] args)
+        {
+            if (args != null)
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i].Equals("-t"))
+                    {
+                        int.TryParse(args[i + 1], out threads);
+                    }
+                }
+            }
+        }
+
+        private static void parseSpamCountIfExists(string[] args)
+        {
+            if (args != null)
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i].Equals("-c"))
+                    {
+                        int.TryParse(args[i + 1], out spamCount);
+                    }
+                }
+            }
+        }
+
         private static void performAsyncComputeTest(int spamCount)
         {
             Stopwatch stopwatch = new Stopwatch();
-            Console.WriteLine("Begin Sync Compute Test");
+            Console.WriteLine("Begin Async Compute Test");
             stopwatch.Start();
-            runMethodAsynchronously(() => computeTest(spamCount / NUMBER_OF_THREADS));
+            runMethodAsynchronously(() => computeTest(spamCount / threads));
             stopwatch.Stop();
             Console.WriteLine("Compute test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
         }
@@ -70,7 +99,7 @@ namespace SecuritiesServiceLoadTester
             Stopwatch stopwatch = new Stopwatch();
             Console.WriteLine("Begin Async Load Test");
             stopwatch.Start();
-            runMethodAsynchronously(() => loadTest(spamCount / NUMBER_OF_THREADS));
+            runMethodAsynchronously(() => loadTest(spamCount / threads));
             stopwatch.Stop();
             Console.WriteLine("Load test complete. Total Securities Queried: {0}", spamCount);
             Console.WriteLine("Load test complete. Total time taken: {0} seconds", stopwatch.Elapsed.TotalSeconds);
@@ -100,7 +129,7 @@ namespace SecuritiesServiceLoadTester
 
         private static void runMethodAsynchronously(Action action)
         {
-            Task[] tasks = new Task[NUMBER_OF_THREADS];
+            Task[] tasks = new Task[threads];
             for (int i = 0; i < tasks.Length; i++)
             {
                 tasks[i] = Task.Run(action);
