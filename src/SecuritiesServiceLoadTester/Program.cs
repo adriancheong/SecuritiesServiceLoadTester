@@ -10,7 +10,7 @@ namespace SecuritiesServiceLoadTester
 {
     public class Program
     {
-        private static readonly string SECURITY_SERVICE_ADDRESS = "http://128.199.219.151:16555/";
+        private static readonly string SECURITY_SERVICE_ADDRESS = "http://128.199.219.151:8080/";
         private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
         private static readonly int DEFAULT_NUMBER_OF_RUNS = 1;
