@@ -77,7 +77,7 @@ namespace SecuritiesServiceLoadTester
             for (int i = 0; i < 10000; i++)
             {
                 stopwatch.Restart();
-                computeTest(spamCount);
+                computeTest(1);
                 Console.WriteLine("Web server response time (seconds): {0} ", stopwatch.Elapsed.TotalSeconds);
             }
         }
