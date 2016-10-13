@@ -36,22 +36,24 @@ namespace SecuritiesServiceLoadTester
             Console.WriteLine("Number of runs:\t\t" + DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
 
+            performRealTimeScaleAnalysis(spamCount);
+
             for (int i = 0; i < DEFAULT_NUMBER_OF_RUNS; i++)
             {
-                Console.WriteLine("---=== Commencing run {0} ===---", i + 1);
-                loadLosses = 0;
-                computeLosses = 0;
-                syncLoadTestTotal += performSyncLoadTest(spamCount);
-                System.Threading.Thread.Sleep(2000);
+                //Console.WriteLine("---=== Commencing run {0} ===---", i + 1);
+                //loadLosses = 0;
+                //computeLosses = 0;
+                //syncLoadTestTotal += performSyncLoadTest(spamCount);
+                //System.Threading.Thread.Sleep(2000);
                 //asyncLoadTestTotal += performAsyncLoadTest(spamCount);
                 //System.Threading.Thread.Sleep(2000);
-                syncComputeTestTotal += performSyncComputeTest(spamCount);
+                //syncComputeTestTotal += performSyncComputeTest(spamCount);
                 //System.Threading.Thread.Sleep(2000);
                 //asyncComputeTestTotal += performAsyncComputeTest(spamCount);
-                Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
-                Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
-                Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
-                Console.WriteLine();
+                //Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
+                //Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
+                //Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
+                //Console.WriteLine();
                 //System.Threading.Thread.Sleep(5000);
             }
 
@@ -66,6 +68,18 @@ namespace SecuritiesServiceLoadTester
 
             Console.WriteLine("Press enter to exit");
             Console.ReadLine();
+        }
+
+        private static void performRealTimeScaleAnalysis(int spamCount)
+        {
+            Console.WriteLine("Performing Real Time Scale Analysis");
+            Stopwatch stopwatch = new Stopwatch();
+            for (int i = 0; i < 10000; i++)
+            {
+                stopwatch.Restart();
+                computeTest(spamCount);
+                Console.WriteLine("Web server response time (seconds): {0} ", stopwatch.Elapsed.TotalSeconds);
+            }
         }
 
         private static void parseThreadCountIfExists(string[] args)
