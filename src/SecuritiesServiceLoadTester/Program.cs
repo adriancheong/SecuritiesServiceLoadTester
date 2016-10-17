@@ -24,6 +24,11 @@ namespace SecuritiesServiceLoadTester
         {
             if (args != null && args.Length == 1)
             {
+                if (args[0].Equals("-rt"))
+                {
+                    performRealTimeScaleAnalysis();
+                    return;
+                }
                 SECURITY_SERVICE_ADDRESS = "http://" + args[0] + ":16555/";
             }
 
@@ -41,7 +46,7 @@ namespace SecuritiesServiceLoadTester
             Console.WriteLine("Number of runs:\t\t" + DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
 
-            //performRealTimeScaleAnalysis(spamCount);
+            //performRealTimeScaleAnalysis();
 
             for (int i = 0; i < DEFAULT_NUMBER_OF_RUNS; i++)
             {
@@ -75,7 +80,7 @@ namespace SecuritiesServiceLoadTester
             Console.ReadLine();
         }
 
-        private static void performRealTimeScaleAnalysis(int spamCount)
+        private static void performRealTimeScaleAnalysis()
         {
             Console.WriteLine("Performing Real Time Scale Analysis");
             Stopwatch stopwatch = new Stopwatch();
