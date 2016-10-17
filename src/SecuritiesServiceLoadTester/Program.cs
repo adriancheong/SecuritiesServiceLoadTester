@@ -24,13 +24,15 @@ namespace SecuritiesServiceLoadTester
         {
             if (args != null && args.Length == 1)
             {
-                if (args[0].Equals("-rt"))
-                {
-                    performRealTimeScaleAnalysis();
-                    return;
-                }
                 SECURITY_SERVICE_ADDRESS = "http://" + args[0] + ":16555/";
             }
+
+            if (args != null && args.Length == 2 && args[1].Equals("-rt"))
+            {
+                performRealTimeScaleAnalysis();
+                return;
+            }
+
 
             double syncLoadTestTotal = 0;
             double asyncLoadTestTotal = 0;
