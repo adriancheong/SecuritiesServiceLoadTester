@@ -10,7 +10,7 @@ namespace SecuritiesServiceLoadTester
 {
     public class Program
     {
-        private static readonly string SECURITY_SERVICE_ADDRESS = "http://52.187.78.28:16555/";
+        private static string SECURITY_SERVICE_ADDRESS = "http://52.187.78.28:16555/";
         private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
         private static readonly int DEFAULT_NUMBER_OF_RUNS = 1;
@@ -22,6 +22,11 @@ namespace SecuritiesServiceLoadTester
 
         public static void Main(string[] args)
         {
+            if (args != null && args.Length == 1)
+            {
+                SECURITY_SERVICE_ADDRESS = "http://" + args[0] + ":16555/";
+            }
+
             double syncLoadTestTotal = 0;
             double asyncLoadTestTotal = 0;
             double syncComputeTestTotal = 0;
@@ -36,25 +41,25 @@ namespace SecuritiesServiceLoadTester
             Console.WriteLine("Number of runs:\t\t" + DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
 
-            performRealTimeScaleAnalysis(spamCount);
+            //performRealTimeScaleAnalysis(spamCount);
 
             for (int i = 0; i < DEFAULT_NUMBER_OF_RUNS; i++)
             {
-                //Console.WriteLine("---=== Commencing run {0} ===---", i + 1);
-                //loadLosses = 0;
-                //computeLosses = 0;
-                //syncLoadTestTotal += performSyncLoadTest(spamCount);
+                Console.WriteLine("---=== Commencing run {0} ===---", i + 1);
+                loadLosses = 0;
+                computeLosses = 0;
+                syncLoadTestTotal += performSyncLoadTest(spamCount);
                 //System.Threading.Thread.Sleep(2000);
                 //asyncLoadTestTotal += performAsyncLoadTest(spamCount);
-                //System.Threading.Thread.Sleep(2000);
-                //syncComputeTestTotal += performSyncComputeTest(spamCount);
+                System.Threading.Thread.Sleep(2000);
+                syncComputeTestTotal += performSyncComputeTest(spamCount);
                 //System.Threading.Thread.Sleep(2000);
                 //asyncComputeTestTotal += performAsyncComputeTest(spamCount);
-                //Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
-                //Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
-                //Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
-                //Console.WriteLine();
-                //System.Threading.Thread.Sleep(5000);
+                Console.WriteLine("Run Completed. Load Losses: " + loadLosses);
+                Console.WriteLine("Run Completed. Compute Losses: " + computeLosses);
+                Console.WriteLine("---=== Run {0} Completed ===---", i + 1);
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(5000);
             }
 
             Console.WriteLine();
