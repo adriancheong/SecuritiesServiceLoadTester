@@ -22,7 +22,7 @@ namespace SecuritiesServiceLoadTester
 
         public static void Main(string[] args)
         {
-            if (args != null && args.Length == 1)
+            if (args != null && args.Length >= 1)
             {
                 SECURITY_SERVICE_ADDRESS = "http://" + args[0] + ":16555/";
             }
