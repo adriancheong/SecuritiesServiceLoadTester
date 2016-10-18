@@ -54,9 +54,6 @@ namespace SecuritiesServiceLoadTester
             double syncComputeTestTotal = 0;
             double asyncComputeTestTotal = 0;
 
-            parseSpamCountIfExists(args);
-            parseThreadCountIfExists(args);
-
             Console.WriteLine("---=== Starting Load Tests ===---");
             Console.WriteLine("Number of calls:\t" + spamCount);
             Console.WriteLine("Number of threads:\t" + threads);
@@ -102,6 +99,16 @@ namespace SecuritiesServiceLoadTester
                 SECURITY_SERVICE_ADDRESS = "http://" + host + ":16555/";
             }
 
+            if (args.Contains("-t"))
+            {
+                int.TryParse(args[Array.IndexOf(args, "-t") + 1], out threads);
+            }
+
+            if (args.Contains("-c"))
+            {
+                int.TryParse(args[Array.IndexOf(args, "-c") + 1], out spamCount);
+            }
+
             if (args.Contains("-rt"))
             {
                 MODE = "realtime";
@@ -117,34 +124,6 @@ namespace SecuritiesServiceLoadTester
                 stopwatch.Restart();
                 computeTest(2);
                 Console.WriteLine("Web server response time (seconds): {0} ", stopwatch.Elapsed.TotalSeconds);
-            }
-        }
-
-        private static void parseThreadCountIfExists(string[] args)
-        {
-            if (args != null)
-            {
-                for (int i = 0; i < args.Length; i++)
-                {
-                    if (args[i].Equals("-t"))
-                    {
-                        int.TryParse(args[i + 1], out threads);
-                    }
-                }
-            }
-        }
-
-        private static void parseSpamCountIfExists(string[] args)
-        {
-            if (args != null)
-            {
-                for (int i = 0; i < args.Length; i++)
-                {
-                    if (args[i].Equals("-c"))
-                    {
-                        int.TryParse(args[i + 1], out spamCount);
-                    }
-                }
             }
         }
 
