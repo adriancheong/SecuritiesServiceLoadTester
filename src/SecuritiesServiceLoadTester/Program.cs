@@ -22,10 +22,11 @@ namespace SecuritiesServiceLoadTester
         private static int computeLosses;
 
         //Usage:
-        //dotnet /root/SecuritiesServiceLoadTester.dll
         //Params:
         //HOST: -h <host ip>
         //REAL TIME MODE: -rt
+        //Threads: -t <threads>
+        //SpamCount: -c <count>
         public static void Main(string[] args)
         {
             parse(args);
