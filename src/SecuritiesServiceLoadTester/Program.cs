@@ -10,7 +10,7 @@ namespace SecuritiesServiceLoadTester
 {
     public class Program
     {
-        private static string SECURITY_SERVICE_ADDRESS = "http://52.187.78.28:16555/";
+        private static string SECURITY_SERVICE_ADDRESS = "http://Classic-959273653.ap-southeast-1.elb.amazonaws.com:16555/";
         private static string MODE = "default";
         private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
@@ -29,6 +29,8 @@ namespace SecuritiesServiceLoadTester
         public static void Main(string[] args)
         {
             parse(args);
+            Console.WriteLine("SERVER HOST:\t" + SECURITY_SERVICE_ADDRESS);
+            Console.WriteLine("Load Test Mode:\t" + MODE);
 
             switch (MODE)
             {
