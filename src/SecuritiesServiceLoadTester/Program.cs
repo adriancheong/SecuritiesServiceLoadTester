@@ -11,6 +11,7 @@ namespace SecuritiesServiceLoadTester
     public class Program
     {
         private static string SECURITY_SERVICE_ADDRESS = "http://52.187.78.28:16555/";
+        private static string MODE = "default";
         private static readonly int DEFAULT_SPAM_COUNT = 200;
         private static readonly int DEFAULT_NUMBER_OF_THREADS = 1;
         private static readonly int DEFAULT_NUMBER_OF_RUNS = 1;
@@ -20,20 +21,32 @@ namespace SecuritiesServiceLoadTester
         private static int loadLosses;
         private static int computeLosses;
 
+        //Usage:
+        //dotnet /root/SecuritiesServiceLoadTester.dll
+        //Params:
+        //HOST: -h <host ip>
+        //REAL TIME MODE: -rt
         public static void Main(string[] args)
         {
-            if (args != null && args.Length >= 1)
+            parse(args);
+
+            switch (MODE)
             {
-                SECURITY_SERVICE_ADDRESS = "http://" + args[0] + ":16555/";
+                case "realtime":
+                    performRealTimeScaleAnalysis();
+                    break;
+                default:
+                    defaultMode(args);
+                    break;
             }
+            
 
-            if (args != null && args.Length == 2 && args[1].Equals("-rt"))
-            {
-                performRealTimeScaleAnalysis();
-                return;
-            }
+            Console.WriteLine("Press enter to exit");
+            Console.ReadLine();
+        }
 
-
+        private static void defaultMode(string[] args)
+        {
             double syncLoadTestTotal = 0;
             double asyncLoadTestTotal = 0;
             double syncComputeTestTotal = 0;
@@ -47,8 +60,6 @@ namespace SecuritiesServiceLoadTester
             Console.WriteLine("Number of threads:\t" + threads);
             Console.WriteLine("Number of runs:\t\t" + DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
-
-            //performRealTimeScaleAnalysis();
 
             for (int i = 0; i < DEFAULT_NUMBER_OF_RUNS; i++)
             {
@@ -76,10 +87,23 @@ namespace SecuritiesServiceLoadTester
             Console.WriteLine("Sync Compute Test Average:\t{0} seconds", syncComputeTestTotal / DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine("Async Compute Test Average:\t{0} seconds", asyncComputeTestTotal / DEFAULT_NUMBER_OF_RUNS);
             Console.WriteLine();
+        }
 
+        private static void parse(string[] args)
+        {
+            if (args == null)
+                return;
 
-            Console.WriteLine("Press enter to exit");
-            Console.ReadLine();
+            if (args.Contains("-h"))
+            {
+                string host = args[Array.IndexOf(args, "-h") + 1];
+                SECURITY_SERVICE_ADDRESS = "http://" + host + ":16555/";
+            }
+
+            if (args.Contains("-rt"))
+            {
+                MODE = "realtime";
+            }
         }
 
         private static void performRealTimeScaleAnalysis()
